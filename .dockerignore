@@ -1,0 +1,14 @@
+**/__pycache__
+.idea
+.pytest_cache
+.git
+db
+migrations
+tests
+venv
+build
+dist
+url_cutter.egg-info
+.coverage
+.coverage.*
+celerybeat-schedule
