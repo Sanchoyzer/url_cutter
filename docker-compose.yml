@@ -1,0 +1,43 @@
+version: '3.7'
+
+services:
+
+  pg:
+    image: postgres:13-alpine
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    volumes:
+#      - pg:/var/lib/postgresql/data
+      - $PWD/db/postgres:/var/lib/postgresql/data
+    # delete ports
+    ports:
+      - '5432:5432'
+
+  redis:
+    image: redis:6.0.9-alpine
+    read_only: true
+    volumes:
+      #- redis:/data
+      - $PWD/db/redis:/data
+#      - $PWD/db/redis/redis-data:/var/lib/redis
+#      - $PWD/db/redis/redis.conf:/usr/local/etc/redis/redis.conf
+
+
+  core:
+    build: .
+    ports:
+      - '9000:9000'
+    entrypoint: ['gunicorn', 'url_cutter.main:app', '-b', '0.0.0.0:9000', '-w', '4', '-k', 'uvicorn.workers.UvicornWorker']
+    depends_on:
+      - pg
+      - redis
+    env_file: .env
+    environment:
+      PYTHONDONTWRITEBYTECODE: '1'
+    volumes:
+      - $PWD/migrations:/srv/src/migrations
+
+
+#volumes:
+#  pg:
+#  redis:
